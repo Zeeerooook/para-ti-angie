@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Poppins&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+ margin:0;
+ height:100vh;
+ background:url('fondo.jpg') center/cover no-repeat;
+ font-family:'Poppins', sans-serif;
+ overflow:hidden;
+}
+
+/* PISTAS */
+.hints{
+ position:absolute;
+ top:30px;
+ left:50%;
+ transform:translateX(-50%);
+ display:flex;
+ gap:15px;
+}
+
+.hint{
+ width:200px;
+ background:rgba(255,255,255,0.75);
+ border-radius:15px;
+ padding:10px;
+ text-align:center;
+ cursor:pointer;
+ backdrop-filter:blur(10px);
+}
+
+.hint-title{
+ font-family:'Dancing Script', cursive;
+ font-size:18px;
+ color:#2c5f8a;
+}
+
+.content{
+ display:none;
+ margin-top:5px;
+ font-size:14px;
+ color:#1f3e5a;
+}
+
+/* PANEL */
+.panel{
+ position:absolute;
+ bottom:50px;
+ left:50%;
+ transform:translateX(-50%);
+ background:rgba(255,255,255,0.25);
+ backdrop-filter:blur(20px);
+ padding:20px;
+ border-radius:25px;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ gap:15px;
+}
+
+/* DISPLAY */
+.display{
+ width:180px;
+ height:50px;
+ background:rgba(0,0,0,0.5);
+ border-radius:12px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:28px;
+ letter-spacing:10px;
+ color:white;
+ transition:0.2s;
+}
+
+/* ERROR VISUAL */
+.error{
+ background:#ff4d4d !important;
+}
+
+/* SHAKE */
+.shake{
+ animation:shake 0.4s;
+}
+@keyframes shake{
+ 0%{transform:translateX(0);}
+ 25%{transform:translateX(-6px);}
+ 50%{transform:translateX(6px);}
+ 75%{transform:translateX(-6px);}
+ 100%{transform:translateX(0);}
+}
+
+/* TECLADO */
+.keypad{
+ display:grid;
+ grid-template-columns:repeat(3,60px);
+ gap:12px;
+}
+
+.key{
+ width:60px;
+ height:60px;
+ border-radius:50%;
+ background:white;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+}
+
+.key:active{
+ transform:scale(0.85);
+}
+
+/* CARTA */
+#letter{
+ position:absolute;
+ width:100%;
+ height:100%;
+ display:none;
+ background:linear-gradient(#eaf4ff,#ffffff);
+}
+
+.letter-box{
+ position:absolute;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%) scale(0.7);
+ width:60%;
+ background:white;
+ padding:40px;
+ border-radius:20px;
+ box-shadow:0 20px 50px rgba(0,0,0,0.2);
+ opacity:0;
+ animation:openLetter 1.2s forwards;
+}
+
+@keyframes openLetter{
+ to{
+  transform:translate(-50%,-50%) scale(1);
+  opacity:1;
+ }
+}
+
+.letter-title{
+ font-family:'Dancing Script';
+ font-size:32px;
+ color:#3b6d9a;
+ text-align:center;
+}
+
+.text{
+ margin-top:20px;
+ font-size:18px;
+ color:#444;
+ line-height:1.7;
+ white-space:pre-line;
+}
+
+/* NOMBRE */
+.name{
+ color:#2c5f8a;
+ font-weight:bold;
+ position:relative;
+}
+.name::after{
+ content:"";
+ position:absolute;
+ left:0;
+ bottom:-2px;
+ width:100%;
+ height:2px;
+ background:#a8d8ff;
+ animation:shine 2s infinite;
+}
+@keyframes shine{
+ 50%{opacity:1;}
+}
+
+/* CORAZONES */
+.hearts{
+ position:absolute;
+ width:100%;
+ height:100%;
+ overflow:hidden;
+}
+.heart{
+ position:absolute;
+ bottom:-50px;
+ color:#a8d8ff;
+ animation:floatUp linear infinite;
+}
+@keyframes floatUp{
+ to{
+  transform:translateY(-110vh);
+  opacity:0;
+ }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="login">
+
+<div class="hints">
+ <div class="hint" onclick="toggle('p1')">
+  <div class="hint-title">Pista 1 💙</div>
+  <div class="content" id="p1"></div>
+ </div>
+ <div class="hint" onclick="toggle('p2')">
+  <div class="hint-title">Pista 2 💙</div>
+  <div class="content" id="p2"></div>
+ </div>
+ <div class="hint" onclick="toggle('p3')">
+  <div class="hint-title">Pista 3 💙</div>
+  <div class="content" id="p3"></div>
+ </div>
+</div>
+
+<div class="panel">
+ <div class="display" id="display">• • • •</div>
+
+ <div class="keypad">
+  <div class="key" onclick="press(1)">1</div>
+  <div class="key" onclick="press(2)">2</div>
+  <div class="key" onclick="press(3)">3</div>
+  <div class="key" onclick="press(4)">4</div>
+  <div class="key" onclick="press(5)">5</div>
+  <div class="key" onclick="press(6)">6</div>
+  <div class="key" onclick="press(7)">7</div>
+  <div class="key" onclick="press(8)">8</div>
+  <div class="key" onclick="press(9)">9</div>
+  <div></div>
+  <div class="key" onclick="press(0)">0</div>
+  <div class="key" onclick="clearCode()">⌫</div>
+ </div>
+</div>
+
+</div>
+
+<div id="letter">
+ <div class="hearts" id="hearts"></div>
+
+ <div class="letter-box">
+  <div class="letter-title">Para ti 💙</div>
+  <div class="text" id="text"></div>
+ </div>
+
+ <audio id="music" src="cancion.mp3" loop></audio>
+ <audio id="paper" src="paper.mp3"></audio>
+</div>
+
+<script>
+
+let code="";
+const correct="0802";
+
+const carta = `Angie, hay cosas que simplemente se sienten en la vida y estar contigo es una de ellas.
+
+Desde que llegaste, todo empezó a tener un poco más de sentido en mi vida
+No de golpe, sino de a poco, en detalles pequeños..
+En momentos que quizás tú ni recuerdas,
+pero que a mí me cambiaron completamente la forma de verte.
+
+Hay algo en ti que me da calma y tranquilidad,
+algo que no sabía que necesitaba hasta que apareció, bueno mejor dicho fuimos forjando.
+
+Y es raro, porque no se trata solo de lo que haces,
+sino de cómo eres…
+de cómo haces que todo se sienta más fácil en mi vida,
+más liviano, más real... Haces que mi vida sea mejor.
+
+No sé si existe una forma perfecta de decir esto,
+pero sí sé que, si tengo que elegir un lugar,
+una persona,
+un momento…
+
+Siempre te voy a elegir a ti.
+
+Sin dudas,
+y sin querer que termine nunca. 💙
+
+
+Y recuerda, fuiste el cometa que apareció en mi vida, Te Amo Angie.`;
+
+const hints=[
+ {date:new Date('2026-05-02'),text:'La respuesta esta en la carta que te mande un 31 de Marzo'},
+ {date:new Date('2026-05-05'),text:'Un viaje unico que se hizo especial, asi como su dia'},
+ {date:new Date('2026-05-08'),text:'Fecha en la cual comenzó todo esto'}
+];
+
+function press(n){
+ if(code.length<4){code+=n;update();}
+ if(code.length===4)check();
+}
+
+function clearCode(){code="";update();}
+function update(){document.getElementById('display').innerText=code.split('').join(' ')||"• • • •";}
+
+function check(){
+ if(code===correct){
+
+  document.getElementById('login').style.display='none';
+  document.getElementById('letter').style.display='block';
+
+  write();
+  createHearts();
+
+  const music=document.getElementById('music');
+  music.volume=0;
+  music.play().catch(()=>{});
+
+  let vol=0;
+  const fade=setInterval(()=>{
+   if(vol<0.015){
+    vol+=0.001;
+    music.volume=vol;
+   } else clearInterval(fade);
+  },200);
+
+ }else{
+
+  const d=document.getElementById('display');
+
+  d.classList.remove('shake','error');
+  void d.offsetWidth;
+
+  d.classList.add('shake','error');
+
+  if(navigator.vibrate) navigator.vibrate(200);
+
+  setTimeout(()=>{
+    d.classList.remove('error');
+    clearCode();
+  },400);
+
+ }
+}
+
+function write(){
+ let i=0;
+ function w(){
+  if(i<carta.length){
+   if(carta.substring(i,i+5) === "Angie"){
+     document.getElementById('text').innerHTML += "<span class='name'>Angie</span>";
+     i+=5;
+   }else{
+     document.getElementById('text').innerHTML += carta[i];
+     i++;
+   }
+   setTimeout(w,35);
+  }
+ }
+ w();
+}
+
+function toggle(id){
+ const el=document.getElementById(id);
+ el.style.display=el.style.display==='block'?'none':'block';
+}
+
+setInterval(()=>{
+ hints.forEach((h,i)=>{
+  const now=new Date();
+  const el=document.getElementById('p'+(i+1));
+
+  if(now>=h.date){
+   el.innerHTML=h.text;
+  }else{
+   const diff=h.date-now;
+   const d=Math.floor(diff/86400000);
+   const h2=Math.floor((diff%86400000)/3600000);
+   const m=Math.floor((diff%3600000)/60000);
+   const s=Math.floor((diff%60000)/1000);
+
+   el.innerHTML=`Se desbloquea en ${d}d ${h2}h ${m}m ${s}s 💙`;
+  }
+ });
+},1000);
+
+function createHearts(){
+ const c=document.getElementById('hearts');
+ setInterval(()=>{
+  const h=document.createElement('div');
+  h.className='heart';
+  h.innerText='💙';
+  h.style.left=Math.random()*100+'%';
+  h.style.animationDuration=(4+Math.random()*4)+'s';
+  c.appendChild(h);
+  setTimeout(()=>h.remove(),8000);
+ },400);
+}
+
+</script>
+
+</body>
+</html>
